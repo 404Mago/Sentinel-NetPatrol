@@ -35,5 +35,19 @@ def analizar_logs(ruta_archivo):
 		print("\n[*] Detalle de atacantes:")
 		for ip, cantidad in conteo_ips.items():
 			print(f"	- IP: {ip} | Intentos bloqueados: {cantidad}")
+		return conteo_ips
+
+def generar_mitigacion(diccionario_ips):
+		with open("block_ips.sh", "w") as archivo_sh:
+			archivo_sh.write("#!/bin/bash\n")
+			for ip, cantidad in diccionario_ips.items():
+				comando = f"iptables -A INPUT -s {ip} -j DROP\n"
+
+				archivo_sh.write(comando)
+
+print(f"[*] Archivo de mitigación 'block_ips.sh' generado exitosamente")
+
 if __name__ == "__main__":
-	analizar_logs(LOG_FILE)
+	diccionario_resultado = analizar_logs(LOG_FILE)
+	if diccionario_resultado:
+			generar_mitigacion(diccionario_resultado)
